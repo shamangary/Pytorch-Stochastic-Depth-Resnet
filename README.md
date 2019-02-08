@@ -22,6 +22,8 @@ The original paper uses the following equation in testing.
 out = self.prob*out + identity
 ```
 However, I found that sometimes it could cause performance degradation.
+
+
 Therefore, I split the different implemenations into two files:
 ```
 TYY_stodepth.py: corresponding to "out = out + identity"
