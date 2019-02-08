@@ -11,7 +11,7 @@ Speed up resnet training process around 1.66x
 ```
 from TYY_stodepth import *
 
-net = resnet18(pretrained=True)
+net = resnet18_StoDepth(pretrained=True)
 
-net = resnet101(pretrained=True)
+net = resnet101_StoDepth(pretrained=True)
 ```
