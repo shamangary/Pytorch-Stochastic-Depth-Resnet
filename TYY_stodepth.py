@@ -82,7 +82,7 @@ class StoDepthBasicBlock(nn.Module):
             if self.downsample is not None:
                 identity = self.downsample(x)
 
-            out = out + identity
+            out = self.prob*out + identity
 
         out = self.relu(out)
 
@@ -156,7 +156,7 @@ class StoDepthBottleneck(nn.Module):
             if self.downsample is not None:
                 identity = self.downsample(x)
 
-            out = out + identity
+            out = self.prob*out + identity
         out = self.relu(out)
 
         return out
