@@ -5,7 +5,7 @@ Original torch implementation: https://github.com/yueatsprograms/Stochastic_Dept
 
 Uniform probability is set to prob=0.5.
 
-Speed up resnet training process around 1.66x
+**Speed up resnet training process around 1.66x**
 
 # How to use?
 ```
