@@ -17,7 +17,7 @@ net = resnet101_StoDepth(pretrained=True)
 ```
 
 # Something you should know
-The original paper use the following equation in testing
+The original paper uses the following equation in testing.
 ```
 out = self.prob*out + identity
 ```
