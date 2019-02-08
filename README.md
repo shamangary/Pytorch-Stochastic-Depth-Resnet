@@ -3,7 +3,7 @@ Pytorch Implementation of Deep Networks with Stochastic Depth https://arxiv.org/
 
 Original torch implementation: https://github.com/yueatsprograms/Stochastic_Depth
 
-Uniform probability is set to prob=0.5.
+Uniform probability is set to prob=0.5. Note that this project do not provide linear decay probability.
 
 **Speed up resnet training process around 1.66x**
 
@@ -15,3 +15,18 @@ net = resnet18_StoDepth(pretrained=True)
 
 net = resnet101_StoDepth(pretrained=True)
 ```
+
+# Something you should know
+The original paper use the following equation in testing
+```
+out = self.prob*out + identity
+```
+However, I found that sometimes it could cause performance degradation.
+Therefore, I split different implemenation in two files:
+```
+TYY_stodepth.py: corresponding to "out = out + identity"
+```
+```
+TYY_stodepth_ori.py: corresponding to "out = self.prob*out + identity"
+```
+
