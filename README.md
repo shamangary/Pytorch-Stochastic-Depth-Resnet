@@ -3,7 +3,7 @@ Pytorch Implementation of Deep Networks with Stochastic Depth https://arxiv.org/
 
 Original torch implementation: https://github.com/yueatsprograms/Stochastic_Depth
 
-Uniform probability is set to prob=0.5. Note that this project do not provide linear decay probability.
+Uniform probability is set to prob=0.5. Note that this project does not provide linear decay probability.
 
 **Speed up resnet training process around 1.66x**
 
