@@ -29,7 +29,7 @@ def conv1x1(in_planes, out_planes, stride=1):
 class StoDepth_BasicBlock(nn.Module):
     expansion = 1
 
-    def __init__(self, prob, inplanes, planes, stride=1, downsample=None):
+    def __init__(self, prob, multFlag, inplanes, planes, stride=1, downsample=None):
         super(StoDepth_BasicBlock, self).__init__()
         self.conv1 = conv3x3(inplanes, planes, stride)
         self.bn1 = nn.BatchNorm2d(planes)
@@ -40,7 +40,8 @@ class StoDepth_BasicBlock(nn.Module):
         self.stride = stride
         self.prob = prob
         self.m = torch.distributions.bernoulli.Bernoulli(torch.Tensor([self.prob]))
-    
+        self.multFlag = multFlag
+
     def forward(self, x):
         
         identity = x.clone()
@@ -82,7 +83,10 @@ class StoDepth_BasicBlock(nn.Module):
             if self.downsample is not None:
                 identity = self.downsample(x)
 
-            out = self.prob*out + identity
+            if self.multFlag:
+                out = self.prob*out + identity
+            else:
+                out = out + identity
 
         out = self.relu(out)
 
@@ -92,7 +96,7 @@ class StoDepth_BasicBlock(nn.Module):
 class StoDepth_Bottleneck(nn.Module):
     expansion = 4
 
-    def __init__(self, prob, inplanes, planes, stride=1, downsample=None):
+    def __init__(self, prob, multFlag, inplanes, planes, stride=1, downsample=None):
         super(StoDepth_Bottleneck, self).__init__()
         self.conv1 = conv1x1(inplanes, planes)
         self.bn1 = nn.BatchNorm2d(planes)
@@ -105,6 +109,7 @@ class StoDepth_Bottleneck(nn.Module):
         self.stride = stride
         self.prob = prob
         self.m = torch.distributions.bernoulli.Bernoulli(torch.Tensor([self.prob]))
+        self.multFlag = multFlag
 
     def forward(self, x):
 
@@ -156,7 +161,11 @@ class StoDepth_Bottleneck(nn.Module):
             if self.downsample is not None:
                 identity = self.downsample(x)
 
-            out = self.prob*out + identity
+            if self.multFlag:
+                out = self.prob*out + identity
+            else:
+                out = out + identity
+
         out = self.relu(out)
 
         return out
@@ -164,7 +173,7 @@ class StoDepth_Bottleneck(nn.Module):
 
 class ResNet_StoDepth_lineardecay(nn.Module):
 
-    def __init__(self, block, prob_0_L, layers, num_classes=1000, zero_init_residual=False):
+    def __init__(self, block, prob_0_L, multFlag, layers, num_classes=1000, zero_init_residual=False):
         super(ResNet_StoDepth_lineardecay, self).__init__()
         self.inplanes = 64
         self.conv1 = nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3,
@@ -173,6 +182,7 @@ class ResNet_StoDepth_lineardecay(nn.Module):
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
+        self.multFlag = multFlag
         self.prob_now = prob_0_L[0]
         self.prob_delta = prob_0_L[0]-prob_0_L[1]
         self.prob_step = self.prob_delta/(sum(layers)-1)
@@ -210,11 +220,11 @@ class ResNet_StoDepth_lineardecay(nn.Module):
             )
 
         layers = []
-        layers.append(block(self.prob_now, self.inplanes, planes, stride, downsample))
+        layers.append(block(self.prob_now, self.multFlag, self.inplanes, planes, stride, downsample))
         self.prob_now = self.prob_now - self.prob_step
         self.inplanes = planes * block.expansion
         for _ in range(1, blocks):
-            layers.append(block(self.prob_now, self.inplanes, planes))
+            layers.append(block(self.prob_now, self.multFlag, self.inplanes, planes))
             self.prob_now = self.prob_now - self.prob_step
 
         return nn.Sequential(*layers)
@@ -237,56 +247,56 @@ class ResNet_StoDepth_lineardecay(nn.Module):
         return x
 
 
-def resnet18_StoDepth_lineardecay(pretrained=False, prob_0_L=[1,0.5], **kwargs):
+def resnet18_StoDepth_lineardecay(pretrained=False, prob_0_L=[1,0.5], multFlag=True, **kwargs):
     """Constructs a ResNet_StoDepth_lineardecay-18 model.
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    model = ResNet_StoDepth_lineardecay(StoDepth_BasicBlock, prob_0_L, [2, 2, 2, 2], **kwargs)
+    model = ResNet_StoDepth_lineardecay(StoDepth_BasicBlock, prob_0_L, multFlag, [2, 2, 2, 2], **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['resnet18']))
     return model
 
 
-def resnet34_StoDepth_lineardecay(pretrained=False, prob_0_L=[1,0.5], **kwargs):
+def resnet34_StoDepth_lineardecay(pretrained=False, prob_0_L=[1,0.5], multFlag=True, **kwargs):
     """Constructs a ResNet_StoDepth_lineardecay-34 model.
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    model = ResNet_StoDepth_lineardecay(StoDepth_BasicBlock, prob_0_L, [3, 4, 6, 3], **kwargs)
+    model = ResNet_StoDepth_lineardecay(StoDepth_BasicBlock, prob_0_L, multFlag, [3, 4, 6, 3], **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['resnet34']))
     return model
 
 
-def resnet50_StoDepth_lineardecay(pretrained=False, prob_0_L=[1,0.5], **kwargs):
+def resnet50_StoDepth_lineardecay(pretrained=False, prob_0_L=[1,0.5], multFlag=True, **kwargs):
     """Constructs a ResNet_StoDepth_lineardecay-50 model.
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    model = ResNet_StoDepth_lineardecay(StoDepth_Bottleneck, prob_0_L, [3, 4, 6, 3], **kwargs)
+    model = ResNet_StoDepth_lineardecay(StoDepth_Bottleneck, prob_0_L, multFlag, [3, 4, 6, 3], **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['resnet50']))
     return model
 
 
-def resnet101_StoDepth_lineardecay(pretrained=False, prob_0_L=[1,0.5], **kwargs):
+def resnet101_StoDepth_lineardecay(pretrained=False, prob_0_L=[1,0.5], multFlag=True, **kwargs):
     """Constructs a ResNet_StoDepth_lineardecay-101 model.
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    model = ResNet_StoDepth_lineardecay(StoDepth_Bottleneck, prob_0_L, [3, 4, 23, 3], **kwargs)
+    model = ResNet_StoDepth_lineardecay(StoDepth_Bottleneck, prob_0_L, multFlag, [3, 4, 23, 3], **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['resnet101']))
     return model
 
 
-def resnet152_StoDepth_lineardecay(pretrained=False, prob_0_L=[1,0.5], **kwargs):
+def resnet152_StoDepth_lineardecay(pretrained=False, prob_0_L=[1,0.5], multFlag=True, **kwargs):
     """Constructs a ResNet_StoDepth_lineardecay-152 model.
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    model = ResNet_StoDepth_lineardecay(StoDepth_Bottleneck, prob_0_L, [3, 8, 36, 3], **kwargs)
+    model = ResNet_StoDepth_lineardecay(StoDepth_Bottleneck, prob_0_L, multFlag, [3, 8, 36, 3], **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['resnet152']))
     return model
