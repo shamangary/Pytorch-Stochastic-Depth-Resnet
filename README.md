@@ -27,7 +27,7 @@ net = resnet18_StoDepth_lineardecay(pretrained=True, prob_0_L=[0.5,0.5], multFla
 net = resnet18_StoDepth_lineardecay(pretrained=True, prob_0_L=[0.5,0.5], multFlag=False)
 ```
 
-# Something you should know for uniform probability
+# Something you should know
 The original paper uses the following equation in testing.
 ```
 out = self.prob*out + identity
