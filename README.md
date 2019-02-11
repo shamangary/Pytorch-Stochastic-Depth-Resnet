@@ -12,10 +12,13 @@ Uniform survival probability is set to prob=0.5.
 # For linear decay probability
 from TYY_stodepth_lineardecay import *
 
-net = resnet18_StoDepth_lineardecay(pretrained=True, prob_0_L=[1,0.5], multFlag=True) # [testing]: out = self.prob*out + identity
+# [testing]: out = self.prob*out + identity
+net = resnet18_StoDepth_lineardecay(pretrained=True, prob_0_L=[1,0.5], multFlag=True) 
 
-net = resnet18_StoDepth_lineardecay(pretrained=True, prob_0_L=[1,0.5], multFlag=False) # [testing]: out = out + identity
+# [testing]: out = out + identity
+net = resnet18_StoDepth_lineardecay(pretrained=True, prob_0_L=[1,0.5], multFlag=False) 
 
+#----------------------------------------------------------------------------------
 # For uniform probability
 from TYY_stodepth import *
 
