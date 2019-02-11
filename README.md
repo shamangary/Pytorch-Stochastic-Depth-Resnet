@@ -6,8 +6,9 @@ Original torch implementation: https://github.com/yueatsprograms/Stochastic_Dept
 **Speed up resnet training process around 1.66x**
 
 # How to use?
+
+### For linear decay probability
 ```
-# For linear decay probability
 from TYY_stodepth_lineardecay import *
 
 # [testing]: out = self.prob*out + identity
@@ -15,9 +16,10 @@ net = resnet18_StoDepth_lineardecay(pretrained=True, prob_0_L=[1,0.5], multFlag=
 
 # [testing]: out = out + identity
 net = resnet18_StoDepth_lineardecay(pretrained=True, prob_0_L=[1,0.5], multFlag=False) 
+```
 
-#----------------------------------------------------------------------------------
-# For uniform probability
+### For uniform probability
+```
 from TYY_stodepth import *
 
 # [testing]: out = self.prob*out + identity
