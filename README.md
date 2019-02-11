@@ -9,14 +9,22 @@ Uniform probability is set to prob=0.5. Note that this project does not provide 
 
 # How to use?
 ```
+# For linear decay probability
+from TYY_stodepth_lineardecay import *
+
+net = resnet18_StoDepth_lineardecay(pretrained=True, prob_0_L=[1,0.5])
+
+
+# For uniform probability
 from TYY_stodepth import *
 
 net = resnet18_StoDepth(pretrained=True)
 
 net = resnet101_StoDepth(pretrained=True)
+
 ```
 
-# Something you should know
+# Something you should know for uniform probability
 The original paper uses the following equation in testing.
 ```
 out = self.prob*out + identity
