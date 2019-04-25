@@ -20,7 +20,7 @@ net = resnet18_StoDepth_lineardecay(pretrained=True, prob_0_L=[1,0.5], multFlag=
 
 ### For uniform probability
 ```
-from TYY_stodepth import *
+from TYY_stodepth_lineardecay import *
 
 # [testing]: out = self.prob*out + identity
 net = resnet18_StoDepth_lineardecay(pretrained=True, prob_0_L=[0.5,0.5], multFlag=True)
